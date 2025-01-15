@@ -1,44 +1,29 @@
 class Animator {
-    constructor(spritesheet, xStart, yStart, width, height, frameCount, frameDuration, framePadding, reverse, loop) {
-        Object.assign(this, { spritesheet, xStart, yStart, height, width, frameCount, frameDuration, framePadding, reverse, loop });
+    constructor(spritesheet, xStart, yStart, width, height, frameCount, frameDuration){
+        Object.assign(this, {spritesheet, xStart, yStart, width, height, frameCount, frameDuration})
 
         this.elapsedTime = 0;
-        this.totalTime = this.frameCount * this.frameDuration;
-
+        this.totalTime = frameCount * frameDuration;
     };
 
-    drawFrame(tick, ctx, x, y, scale) {
+    drawFrame(tick, ctx, x, y) {
+
         this.elapsedTime += tick;
+        if(this.elapsedTime > this.totalTime) this.elapsedTime -= this.totalTime;
+        const frame = this.currentFrame();
 
-        if (this.isDone()) {
-            if (this.loop) {
-                this.elapsedTime -= this.totalTime;
-            } else {
-                return;
-            }
-        }
-
-        let frame = this.currentFrame();
-        if (this.reverse) frame = this.frameCount - frame - 1;
-       
-        ctx.drawImage(this.spritesheet,
-            this.xStart + frame * (this.width + this.framePadding), this.yStart, //source from sheet
+        ctx.drawImage(this.spritesheet, 
+            this.xStart + this.width*frame, this.yStart, 
             this.width, this.height,
             x, y,
-            this.width * scale,
-            this.height * scale);
-
-        if (PARAMS.DEBUG) {
-            ctx.strokeStyle = 'Green';
-            ctx.strokeRect(x, y, this.width * scale, this.height * scale);
-        }
-    };
+            this.width * 2, this.height * 2);
+    }
 
     currentFrame() {
         return Math.floor(this.elapsedTime / this.frameDuration);
-    };
+    }
 
     isDone() {
         return (this.elapsedTime >= this.totalTime);
-    };
-};
+    }
+}
